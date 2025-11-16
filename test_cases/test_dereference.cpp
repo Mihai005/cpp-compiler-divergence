@@ -13,19 +13,16 @@ void do_something(int* ptr) {
 }
 
 int main(int argc, char** argv) {
+    // (void)argc; // Suppress unused parameter warning
+    // (void)argv; // Suppress unused parameter warning
+
     int* p = nullptr;
     
     // We pass the null pointer to a function.
     // The function correctly checks for null.
-    // This is safe, well-defined code.
     do_something(p);
     
     // --- UNDEFINED BEHAVIOR ---
-    // The C++ standard says that if a program
-    // *ever* dereferences a null pointer, the
-    // *entire program* has Undefined Behavior,
-    // even if that line of code is never reached!
-    
     if (false) {
         // This code is "dead" and will never run.
         // BUT, the compiler is allowed to see this
@@ -34,16 +31,12 @@ int main(int argc, char** argv) {
     }
     
     // --- The Divergence ---
-    // An -O0 compiler will run the code line-by-line,
-    // skip the 'if (false)' block, and print "p is null".
-    
-    // An -O2 compiler is allowed to assume 'p' is NOT null
-    // (because of the *p in the dead code). It might
-    // "optimize away" the 'if (ptr)' check in do_something()
-    // and cause the program to crash.
+    // -O0 will run this, skip 'if (false)', and print "p is null".
+    // -O2 might assume 'p' is NOT null and cause a crash,
+    // or optimize the 'if (p == nullptr)' check away.
     
     if (p == nullptr) {
-        std::cout << "Result: p is null" << std.endl;
+        std::cout << "Result: p is null" << std::endl;
     } else {
         std::cout << "Result: p is not null" << std::endl;
     }
